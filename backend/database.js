@@ -1,12 +1,32 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const { spawnSync } = require('child_process');
+const path = require('path');
 
 const db = new PrismaClient();
+
+function runPrismaPush() {
+  console.log('Applying Prisma schema to database...');
+  const result = spawnSync('npx', ['prisma', 'db', 'push', '--accept-data-loss'], {
+    cwd: __dirname,
+    stdio: 'inherit',
+    env: process.env,
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    throw new Error('Prisma schema push failed');
+  }
+}
 
 async function initDatabase() {
   try {
     await db.$connect();
     console.log('เชื่อมต่อฐานข้อมูล PostgreSQL สำเร็จ');
+
+    runPrismaPush();
 
     const adminPassword = await bcrypt.hash('admin123', 10);
     await db.user.upsert({
@@ -56,6 +76,4 @@ async function initDatabase() {
   }
 }
 
-initDatabase();
-
-module.exports = db;
+module.exports = { db, initDatabase };
