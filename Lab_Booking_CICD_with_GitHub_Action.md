@@ -794,6 +794,15 @@ find . -name "*.postman_collection.json"
           "name": "Create Room (Admin)",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const suffix = Math.floor(Math.random() * 100000);",
+                  "pm.collectionVariables.set('roomSuffix', suffix);"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -817,7 +826,7 @@ find . -name "*.postman_collection.json"
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"name\": \"Deluxe Room 101\", \"type\": \"Deluxe\", \"capacity\": 2, \"price\": 1500}"
+              "raw": "{\"name\": \"Deluxe Room {{roomSuffix}}\", \"roomType\": \"Deluxe-{{roomSuffix}}\", \"description\": \"Deluxe room with premium amenities\", \"capacity\": 2, \"price\": 1500}"
             },
             "url": "{{baseUrl}}/api/rooms"
           }
@@ -851,7 +860,7 @@ find . -name "*.postman_collection.json"
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\"guestName\": \"Test Guest\", \"guestEmail\": \"test@example.com\", \"roomId\": {{roomId}}, \"checkIn\": \"2025-09-01\", \"checkOut\": \"2025-09-03\"}"
+              "raw": "{\"fullname\": \"Test Guest\", \"email\": \"test@example.com\", \"phone\": \"0123456789\", \"roomId\": {{roomId}}, \"checkin\": \"2025-09-01\", \"checkout\": \"2025-09-03\", \"guests\": 2}"
             },
             "url": "{{baseUrl}}/api/bookings"
           }
